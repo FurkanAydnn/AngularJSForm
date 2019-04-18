@@ -1,0 +1,57 @@
+﻿<div class="container" ng-app="KayitApp" ng-init="BasvuruTipi='1'" ng-controller="KayitCtrl">
+    <h1>Kayıt Formu</h1>
+    <form class="form-horizontal" method="post" action="/Home/KayitFormu">
+        <div class="form-group">
+            <label class="col-md-2">Başvuru Tipi: </label>
+            <label style="margin-right:20px;">
+                <input ng-model="BasvuruTipi" type="radio" name="BasvuruTipi" value="1" /> Bireysel Başvuru
+            </label>
+            <label>
+                <input ng-model="BasvuruTipi" type="radio" name="BasvuruTipi" value="2" /> Kurumsal Başvuru
+            </label>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">Ad Soyad</label>
+            <input ng-model="AdSoyad" class="form-control" name="AdSoyad" required />
+        </div>
+        <div class="form-group" ng-show="BasvuruTipi=='1'">
+            <label class="col-md-2">TC</label>
+            <input ng-model="TC" class="form-control" name="TC" ng-required="BasvuruTipi=='1'" />
+        </div>
+        <div class="form-group" ng-show="BasvuruTipi=='2'">
+            <label class="col-md-2">Firma Adı</label>
+            <input ng-model="FirmaAdi" class="form-control" name="FirmaAdi" ng-required="BasvuruTipi=='2'" />
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">Adres</label>
+            <input ng-model="Adres" class="form-control" name="Adres" />
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">Şehir</label>
+            <select ng-model="SehirId" class="form-control" name="SehirId" ng-options="s.SehirAd for s in sehirler track by s.Id" ng-change="IlceYukle()" required></select>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">İlçe</label>
+            <select ng-model="IlceModel" class="form-control" name="IlceName" ng-options="i.IlceAd for i in ilceDizi track by i.Id" ng-change="SemtYukle()" required></select>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">Semt</label>
+            <select ng-model="SemtModel" ng-options="s.SemtAd for s in semtDizi track by s.Id" ng-change="MahalleYukle()" class="form-control" name="Semt" required></select>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2">Mahalle</label>
+            <select ng-model="MahalleModel" ng-options="m.MahalleAd for m in mahalleDizi track by m.Id" class="form-control" name="MahalleId" required></select>
+        </div>
+        <button class="btn btn-success">Kaydet</button>
+    </form>
+</div>
+
+
+@section Scripts{
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js
+"></script>
+    <script>
+        var app = angular.module("KayitApp", []);
+        var kayitCtrl = app.controller("KayitCtrl", function ($scope, $http) { });
+    </script>
+}

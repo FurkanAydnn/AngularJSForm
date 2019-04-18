@@ -1,0 +1,226 @@
+﻿
+@section CSS{
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <style>
+        .section {
+            margin-top: 30px;
+        }
+
+        .popup_content_wrap {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            position: fixed;
+            background: rgba(0, 0, 0, 0.30);
+        }
+
+        .popup_content {
+            width: 50%;
+            padding: 20px;
+            position: fixed;
+            top: 15%;
+            left: 25%;
+            border: 1px solid black;
+            border-radius: 5px;
+            background: white;
+        }
+
+        th, td {
+            text-align: center;
+        }
+
+        .check_area, .remove_area, .label_area {
+            padding-top: 8px;
+        }
+
+        .label_area {
+            padding-left: 3px;
+        }
+
+        .req_check {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .list-group-item {
+            min-height: 55px;
+        }
+    </style>
+}
+<div class="section" ng-app="JSForm" ng-controller="FormCtrl">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <button onClick="popup_content('show')" class="btn btn-primary btn-xs pull-right"> <b>+</b> Yeni Form Oluştur</button>
+                <br /><br />
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Form Adı</th>
+                            <th>Tanım</th>
+                            <th>Tarih</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="form in oldFormsArray">
+                            <td>{{form.name}}</td>
+                            <td>{{form.description}}</td>
+                            <td>{{form.createdAt | date:'dd-MM-yyyy'}}</td>
+                            <td class="text-center"><a class='btn btn-info btn-xs' href="/forms/forms/{{form.name}}"><span class="glyphicon glyphicon-edit"></span> İncele</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="popup_content_wrap" style="display:none;">
+            <div class="popup_content" style="display:none;">
+                <div class="text-right">
+                    <button class="btn btn-danger btn-xs" ng-click="closeForm()" onClick="popup_content('hide')">x</button>
+                </div>
+                <br />
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="col-sm-3">
+                            <label class="control-label label_area">Form Adı:</label>
+                        </div>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" ng-model="createdForm.name" placeholder="Form adını giriniz...">
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="col-sm-3">
+                            <label class="control-label label_area">Form Tanımı:</label>
+                        </div>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" ng-model="createdForm.description" placeholder="Form tanımını giriniz...">
+                        </div>
+                    </li>
+                    <li class="list-group-item" ng-repeat="field in fields">
+                        <div class="col-sm-3">
+                            <select class="form-control" ng-model="field.dataType" ng-options="item for item in selectOptions"></select>
+                        </div>
+                        <div class="col-sm-6">
+                            <input class="form-control" type="text" ng-model="field.name" placeholder="Alan adını giriniz...">
+                        </div>
+                        <div class="col-sm-2 check_area">
+                            <input type="checkbox" ng-model="field.required" id="{{field.id}}" />
+                            <label for="{{field.id}}">Zorunlu</label>
+                        </div>
+                        <div class="col-sm-1 text-center remove_area">
+                            <button class="btn btn-info btn-xs" ng-click="removeField(field.id)">x</button>
+                        </div>
+                        <br /><br />
+                    </li>
+                </ul>
+                <div class="text-center">
+                    <button class="btn btn-warning" ng-click="addNewField()">Yeni alan ekle</button>
+                    <button class="btn btn-success" onClick="popup_content('hide')" ng-click="saveForm()">Formu Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        function popup_content(hideOrshow) {
+            if (hideOrshow != null) {
+                if (hideOrshow == 'hide') {
+                    $('.popup_content_wrap').hide();
+                    $('.popup_content').hide();
+                }
+                else {
+                    $('.popup_content_wrap').show();
+                    $('.popup_content').show("slow");
+                }
+            }
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.10/ngStorage.min.js"></script>
+    <script>
+        var app = angular.module("JSForm", []);
+        var kayitCtrl = app.controller("FormCtrl", function ($scope) {
+            $scope.selectOptions = [
+                "String",
+                "Number"
+            ];
+
+            $scope.createdForm = {
+                "name": "",
+                "description": "",
+                "createdAt": "",
+                fields: []
+            };
+
+            $scope.fields = [{ "id": 1, "required": false, "dataType": "String", "name": "" }];
+
+            $scope.createdForm.fields = $scope.fields;
+
+            $scope.index = $scope.fields.length;
+
+            $scope.addNewField = function () {
+                var newItemNo = ++$scope.index;
+                $scope.fields.push({ "id": newItemNo, "required": false, "dataType": "String", "name": "" });
+            };
+
+            $scope.removeField = function (id) {
+
+                if ($scope.fields.length <= 1) {
+                    alert("input cannot be less than 1");
+                    return;
+                }
+
+
+                var index = -1;
+                var comArr = eval($scope.fields);
+                for (var i = 0; i < comArr.length; i++) {
+                    if (comArr[i].id === id) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index === -1) {
+                    alert("Something gone wrong");
+                }
+                $scope.fields.splice(index, 1);
+            };
+
+            $scope.oldFormsArray = [];
+
+            if (localStorage.getItem('AngularJSForm') != null) {
+                $scope.oldForms = angular.fromJson(localStorage.getItem('AngularJSForm'));
+                $scope.oldFormsArray = $scope.oldForms;
+            }
+
+            $scope.saveForm = function () {
+                $scope.createdFormArray = [];
+                $scope.createdForm.createdAt = new Date();
+                $scope.createdFormArray.push($scope.createdForm);
+                $scope.createdFormArray = $scope.createdFormArray.concat($scope.oldFormsArray);
+                console.log($scope.createdFormArray);
+                localStorage.setItem("AngularJSForm", angular.toJson($scope.createdFormArray));
+                $scope.closeForm();
+            };
+
+
+            $scope.closeForm = function () {
+                $scope.createdForm = {
+                    "name": "",
+                    "description": "",
+                    "createdAt": "",
+                    fields: []
+                };
+                $scope.fields = [{ "id": 1, "required": false, "dataType": "String", "name": "" }];
+
+                if (localStorage.getItem('AngularJSForm') != null) {
+                    $scope.oldForms = angular.fromJson(localStorage.getItem('AngularJSForm'));
+                    $scope.oldFormsArray = $scope.oldForms;
+                }
+            }
+        });
+    </script>
+}

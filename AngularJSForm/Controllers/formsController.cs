@@ -6,24 +6,17 @@ using System.Web.Mvc;
 
 namespace AngularJSForm.Controllers
 {
-    public class HomeController : Controller
+    public class formsController : Controller
     {
+        // GET: forms
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult About()
+        public ActionResult forms(string id)
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
+            ViewBag.FormName = id;
             return View();
         }
     }
